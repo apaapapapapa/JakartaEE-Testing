@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="ja"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+  <h:head>
+    <title>JSF Bootable Jar example</title>
+    <link rel="stylesheet" href="#{request.contextPath}/resources/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/>
+    <script src="#{request.contextPath}/resources/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <h:outputStylesheet library="css" name="styles.css"/>
+  </h:head>
+  <h:body>
+    <div class="container mt-4">
+      <!-- =======================
+           Header
+      ======================== -->
+      <header class="mb-4">
+        <h1 class="display-6 fw-bold text-primary">
+          <i class="bi bi-list-task me-2"></i>
+          タスク管理アプリ
+        </h1>
+      </header>
+
+      <main>
+        <!-- =======================
+             Add Task Section
+        ======================== -->
+        <section id="add-task" aria-label="タスク追加" class="mb-4">
+          <!-- タスク追加フォーム -->
+          <h:form id="form-add">
+            <div class="card shadow-sm border-primary">
+              <div class="card-header bg-primary text-white section-header">
+                <i class="bi bi-plus-circle section-icon"></i>
+                Add Task
+                <span class="ms-2" title="新しいタスクを追加します">
+                  <i class="bi bi-info-circle" style="cursor: pointer;"></i>
+                </span>
+              </div>
+              <div class="card-body">
+                <div class="row g-2 align-items-center mb-2">
+                  <div class="col-auto">
+                    <h:outputLabel value="Title: " for="inputTitle"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="inputTitle" value="#{taskBean.title}" styleClass="form-control" placeholder="Title"/>
+                  </div>
+                  <div class="col-auto">
+                    <h:outputLabel value="Due Date: " for="inputDueDate"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="inputDueDate" value="#{taskBean.dueDate}" styleClass="form-control" placeholder="Due Date"/>
+                  </div>
+                  <div class="col-auto d-flex align-items-center">
+                    <h:selectBooleanCheckbox id="inputCompleted" value="#{taskBean.completed}" styleClass="form-check-input"/>
+                    <label for="inputCompleted" class="form-check-label ms-1">Completed</label>
+                  </div>
+                  <div class="col-auto">
+                    <h:commandButton id="add" value="Add" styleClass="btn btn-primary">
+                      <f:ajax execute="inputTitle inputDueDate inputCompleted" render="outputGroup" listener="#{taskBean.add}"/>
+                    </h:commandButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </h:form>
+        </section>
+
+        <!-- =======================
+             Delete Task Section
+        ======================== -->
+        <section id="delete-task" aria-label="タスク削除" class="mb-4">
+          <!-- タスク削除フォーム -->
+          <h:form id="form-delete">
+            <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white section-header">
+              <i class="bi bi-trash section-icon"></i>
+              Delete Task
+              <span class="ms-2" title="タスクIDを指定してタスクを削除します">
+                <i class="bi bi-info-circle" style="cursor: pointer;"></i>
+              </span>
+            </div>
+              <div class="card-body">
+                <div class="row g-2 align-items-center mb-2">
+                  <div class="col-auto">
+                    <h:outputLabel value="Task Id: " for="delTitle"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="delTitle" value="#{taskBean.id}" styleClass="form-control" placeholder="Task Id">
+                      <f:validateLongRange minimum="1" maximum="99"/>
+                    </h:inputText>
+                  </div>
+                  <div class="col-auto">
+                    <h:commandButton id="del" value="Delete" styleClass="btn btn-danger">
+                      <f:ajax execute="delTitle" render="outputGroup" listener="#{taskBean.delete}"/>
+                    </h:commandButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </h:form>
+        </section>
+
+        <!-- =======================
+             Update Task Section
+        ======================== -->
+        <section id="update-task" aria-label="タスク更新" class="mb-4">
+          <!-- タスク更新フォーム -->
+          <h:form id="form-update">
+            <div class="card shadow-sm border-warning">
+              <div class="card-header bg-warning text-dark section-header">
+                <i class="bi bi-pencil-square section-icon"></i>
+                Update Task
+              </div>
+              <div class="card-body">
+                <div class="row g-2 align-items-center mb-2">
+                  <div class="col-auto">
+                    <h:outputLabel value="Task Id: " for="updateId"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="updateId" value="#{taskBean.id}" styleClass="form-control" placeholder="Task Id">
+                      <f:validateLongRange minimum="1" maximum="99"/>
+                    </h:inputText>
+                  </div>
+                  <div class="col-auto">
+                    <h:outputLabel value="Title: " for="updateTitle"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="updateTitle" value="#{taskBean.title}" styleClass="form-control" placeholder="Title"/>
+                  </div>
+                  <div class="col-auto">
+                    <h:outputLabel value="Due Date: " for="updateDueDate"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="updateDueDate" value="#{taskBean.dueDate}" styleClass="form-control" placeholder="Due Date"/>
+                  </div>
+                  <div class="col-auto d-flex align-items-center">
+                    <h:selectBooleanCheckbox id="updateCompleted" value="#{taskBean.completed}" styleClass="form-check-input"/>
+                    <label for="updateCompleted" class="form-check-label ms-1">Completed</label>
+                  </div>
+                  <div class="col-auto">
+                    <h:commandButton id="update" value="Update" styleClass="btn btn-warning">
+                      <f:ajax execute="updateId updateTitle updateDueDate updateCompleted" render="outputGroup"
+                              listener="#{taskBean.update}"/>
+                    </h:commandButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </h:form>
+        </section>
+
+        <!-- =======================
+             Progress Section
+        ======================== -->
+        <section id="progress" aria-label="進捗率" class="mb-4">
+          <label class="form-label fw-bold" for="progressRateBar">進捗率</label>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <progress id="progressRateBar"
+                      value="#{taskBean.progressRate}"
+                      max="100"
+                      style="width: 300px; height: 2rem; vertical-align: middle; accent-color: #198754;">
+            </progress>
+            <span style="font-size: 1.1rem;">
+              <h:outputText value="#{taskBean.progressRate}">
+                <f:convertNumber type="number" maxFractionDigits="1" minFractionDigits="1"/>
+              </h:outputText>%
+            </span>
+          </div>
+        </section>
+
+        <!-- =======================
+             Delay Risk Section
+        ======================== -->
+        <section id="risk" aria-label="遅延リスク" class="mb-4">
+          <!-- 遅延リスク高タスク率の表示 -->
+          <div class="#{taskBean.delayRiskRate ge 30.0 ? 'alert alert-danger' : (taskBean.delayRiskRate ge 10.0 ? 'alert alert-warning' : 'alert alert-success')} d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            遅延リスク高タスク率: 
+            <span class="fw-bold ms-1">#{taskBean.delayRiskRate}%</span>
+          </div>
+          <!-- 遅延リスク高タスク一覧の表示 -->
+          <div class="table-responsive">
+            <h:dataTable value="#{taskBean.highRiskTasks}" var="task" styleClass="table table-bordered table-danger align-middle">
+              <h:column>
+                <f:facet name="header">タイトル</f:facet>
+                #{task.title}
+              </h:column>
+              <h:column>
+                <f:facet name="header">期日</f:facet>
+                #{task.dueDate}
+              </h:column>
+            </h:dataTable>
+            <h:outputText rendered="#{empty taskBean.highRiskTasks}" value="遅延リスク高タスクはありません。" styleClass="text-muted"/>
+          </div>
+        </section>
+
+        <!-- =======================
+             Task Hierarchy Section
+        ======================== -->
+        <section id="hierarchy" aria-label="タスク階層" class="mb-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-info text-white section-header">
+              <i class="bi bi-diagram-3 section-icon"></i>
+              Task Hierarchy
+            </div>
+            <div class="card-body">
+              <ui:repeat value="#{taskBean.rootTasks}" var="parentTask">
+                <ul style="list-style-type: none; padding-left: 0;">
+                  <li>
+                    <span class="fw-bold">[#{parentTask.id}] #{parentTask.title}</span>
+                    <span class="ms-2 text-muted">#{parentTask.dueDate}</span>
+                    <span class="badge #{parentTask.completed ? 'bg-success' : 'bg-secondary'} ms-2">
+                      #{parentTask.completed ? 'Completed' : 'Incomplete'}
+                    </span>
+                    <!-- サブタスク再帰表示 -->
+                    <ui:fragment rendered="#{not empty taskBean.getSubtasks(parentTask)}">
+                      <ul style="padding-left: 2em;">
+                        <ui:repeat value="#{taskBean.getSubtasks(parentTask)}" var="subTask">
+                          <li>
+                            <span>[#{subTask.id}] #{subTask.title}</span>
+                            <span class="ms-2 text-muted">#{subTask.dueDate}</span>
+                            <span class="badge #{subTask.completed ? 'bg-success' : 'bg-secondary'} ms-2">
+                              #{subTask.completed ? 'Completed' : 'Incomplete'}
+                            </span>
+                            <!-- さらにサブサブタスクがあれば再帰的に表示 -->
+                            <ui:fragment rendered="#{not empty taskBean.getSubtasks(subTask)}">
+                              <ul style="padding-left: 2em;">
+                                <ui:repeat value="#{taskBean.getSubtasks(subTask)}" var="subSubTask">
+                                  <li>
+                                    <span>[#{subSubTask.id}] #{subSubTask.title}</span>
+                                    <span class="ms-2 text-muted">#{subSubTask.dueDate}</span>
+                                    <span class="badge #{subSubTask.completed ? 'bg-success' : 'bg-secondary'} ms-2">
+                                      #{subSubTask.completed ? 'Completed' : 'Incomplete'}
+                                    </span>
+                                    <!-- 必要なら更に再帰化可能 -->
+                                  </li>
+                                </ui:repeat>
+                              </ul>
+                            </ui:fragment>
+                          </li>
+                        </ui:repeat>
+                      </ul>
+                    </ui:fragment>
+                  </li>
+                </ul>
+              </ui:repeat>
+            </div>
+          </div>
+        </section>
+
+        <!-- =======================
+             Add Subtask Section
+        ======================== -->
+        <section id="add-subtask" aria-label="サブタスク追加" class="mb-4">
+          <!-- サブタスク追加フォーム -->
+          <h:form id="form-add-subtask">
+            <div class="card shadow-sm border-success">
+              <div class="card-header bg-success text-white section-header">
+                <i class="bi bi-node-plus section-icon"></i>
+                Add Subtask
+              </div>
+              <div class="card-body">
+                <div class="row g-2 align-items-center mb-2">
+                  <div class="col-auto">
+                    <h:outputLabel value="Parent Task: " for="parentSelect"/>
+                  </div>
+                  <div class="col">
+                    <h:selectOneMenu id="parentSelect" value="#{taskBean.parentId}" styleClass="form-select">
+                      <f:selectItem itemLabel="(Root Task)" itemValue="#{null}" />
+                      <f:selectItems value="#{taskBean.allTasks}" var="t" itemLabel="#{t.title}" itemValue="#{t.id}" />
+                    </h:selectOneMenu>
+                  </div>
+                  <div class="col-auto">
+                    <h:outputLabel value="Title: " for="subtaskTitle"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="subtaskTitle" value="#{taskBean.subtaskTitle}" styleClass="form-control" placeholder="Subtask Title"/>
+                  </div>
+                  <div class="col-auto">
+                    <h:outputLabel value="Due Date: " for="subtaskDueDate"/>
+                  </div>
+                  <div class="col">
+                    <h:inputText id="subtaskDueDate" value="#{taskBean.subtaskDueDate}" styleClass="form-control" placeholder="Due Date"/>
+                  </div>
+                  <div class="col-auto d-flex align-items-center">
+                    <h:selectBooleanCheckbox id="subtaskCompleted" value="#{taskBean.subtaskCompleted}" styleClass="form-check-input"/>
+                    <label for="subtaskCompleted" class="form-check-label ms-1">Completed</label>
+                  </div>
+                  <div class="col-auto">
+                    <h:commandButton id="addSubtask" value="Add Subtask" styleClass="btn btn-success">
+                      <f:ajax execute="parentSelect subtaskTitle subtaskDueDate subtaskCompleted" render="outputGroup" listener="#{taskBean.addSubtask}"/>
+                    </h:commandButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </h:form>
+        </section>
+
+        <!-- =======================
+             Task List Section
+        ======================== -->
+        <section id="task-list" aria-label="タスク一覧" class="mb-4">
+          <h:panelGroup id="outputGroup" layout="block">
+            <div class="card shadow-sm">
+              <div class="card-header bg-secondary text-white section-header">
+                <i class="bi bi-list-task section-icon"></i>
+                Task List
+              </div>
+              <div class="card-body p-0">
+                <h:dataTable id="taskTable" value="#{taskBean.allTasks}" var="row" title="Task List" styleClass="table table-striped table-bordered mb-0 align-middle">
+                  <h:column>
+                    <f:facet name="header">ID</f:facet>
+                    #{row.id}
+                  </h:column>
+                  <h:column>
+                    <f:facet name="header">Title</f:facet>
+                    #{row.title}
+                  </h:column>
+                  <h:column>
+                    <f:facet name="header">Due Date</f:facet>
+                    #{row.dueDate}
+                  </h:column>
+                  <h:column>
+                    <f:facet name="header">Completed</f:facet>
+                    <span class="badge #{row.completed ? 'bg-success' : 'bg-secondary'} fs-5">
+                      #{row.completed ? 'Completed' : 'Incomplete'}
+                    </span>
+                    <h:outputText rendered="#{row.trulyCompleted}" >
+                      <span class="badge bg-info ms-2 fs-6">Truly Completed</span>
+                    </h:outputText>
+                  </h:column>
+                </h:dataTable>
+              </div>
+            </div>
+            <h:messages id="messages"
+                        styleClass="mt-3"
+                        globalOnly="true"
+                        showDetail="true"
+                        showSummary="true"
+                        layout="table"
+            >
+              <f:facet name="infoMarker">
+                <span class="alert alert-info d-flex align-items-center mb-2">
+                  <i class="bi bi-info-circle"></i>
+                </span>
+              </f:facet>
+              <f:facet name="errorMarker">
+                <span class="alert alert-danger d-flex align-items-center mb-2">
+                  <i class="bi bi-exclamation-triangle"></i>
+                </span>
+              </f:facet>
+              <f:facet name="fatalMarker">
+                <span class="alert alert-danger d-flex align-items-center mb-2">
+                  <i class="bi bi-x-octagon"></i>
+                </span>
+              </f:facet>
+              <f:facet name="warnMarker">
+                <span class="alert alert-warning d-flex align-items-center mb-2">
+                  <i class="bi bi-exclamation-circle"></i>
+                </span>
+              </f:facet>
+            </h:messages>
+          </h:panelGroup>
+        </section>
+      </main>
+    </div>
+  </h:body>
+</html>

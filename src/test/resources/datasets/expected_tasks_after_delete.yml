@@ -1,0 +1,4 @@
+Task:
+  - id: 2
+    title: "task2"  # task1 が削除されている
+    completed: true

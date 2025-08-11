@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS task;
+CREATE TABLE task (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    due_date DATE,
+    completed BOOLEAN DEFAULT FALSE,
+    parent_id BIGINT
+);
