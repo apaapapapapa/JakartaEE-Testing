@@ -1,7 +1,5 @@
 Task:
-  - id: 1
-    title: "task1"
+  - title: "task1"
     completed: false
-  - id: 2
-    title: "task2"
+  - title: "task2"
     completed: true
