@@ -1,3 +1,0 @@
-<arquillian xmlns="http://jboss.org/schema/arquillian">
-  <container qualifier="weld-se-embedded" default="true"/>
-</arquillian>

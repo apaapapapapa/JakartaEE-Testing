@@ -1,10 +1,12 @@
-package com.example.task;
+package com.example.task.jpa;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.example.task.Task;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;

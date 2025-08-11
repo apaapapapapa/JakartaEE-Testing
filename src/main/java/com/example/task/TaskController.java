@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.task.jpa.TaskRepository;
+
 import jakarta.ejb.EJBException;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;

@@ -1,4 +1,4 @@
-package com.example.task;
+package com.example.task.jpa;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;

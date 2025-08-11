@@ -1,5 +1,7 @@
-connectionConfig:
-  driver: "org.h2.Driver"
-  url: "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
-  user: "sa"
-  password: ""
+# src/test/resources/dbunit.yml
+cacheConnection: false
+# 接続は BaseTest の ConnectionHolder を使っているので省略
+
+properties:
+  caseSensitiveTableNames: false
+  allowEmptyFields: true
