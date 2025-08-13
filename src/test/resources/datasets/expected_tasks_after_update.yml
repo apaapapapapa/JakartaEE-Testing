@@ -1,7 +1,0 @@
-Task:
-  - id: 1
-    title: "updatedTask"  # task1 が更新される
-    completed: false
-  - id: 2
-    title: "task2"
-    completed: true

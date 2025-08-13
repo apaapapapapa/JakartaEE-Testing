@@ -13,10 +13,8 @@ import com.github.database.rider.core.api.exporter.ExportDataSet;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 
-import com.example.task.Task;
 import com.example.task.mybatis.TaskMapper;
 
 @DBRider
@@ -32,13 +30,8 @@ class SnapshotTaskExportTest extends BaseTest {
 
     @Test
     @DataSet(value = "datasets/tasks.yml", cleanBefore = true)
-    @ExportDataSet(format = DataSetFormat.XML, outputName = "tasks-after-export.xml")
+    @ExportDataSet(format = DataSetFormat.YML, outputName = "tasks-after-export.yml")
     void export_afterInsert() {
-        // Task t = new Task();
-        // t.setTitle("SnapshotTask");
-        // t.setDueDate(LocalDate.now());
-        // t.setCompleted(false);
-        // taskMapper.create(t);
         System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         System.out.println(taskMapper.findAll().get(0).getTitle());
     }

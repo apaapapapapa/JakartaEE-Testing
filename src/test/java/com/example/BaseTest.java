@@ -1,7 +1,7 @@
 package com.example;
 
 import java.sql.Connection;
-
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.sql.DataSource;
 import jakarta.inject.Inject;
 
@@ -17,38 +17,36 @@ import com.github.database.rider.junit5.DBUnitExtension;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
-import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
-
 
 @ExtendWith({WeldJunit5Extension.class, DBUnitExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class BaseTest {
 
-private static final String CHANGELOG_PATH = "db/changelog/db.changelog-master.yaml";
+    private static final String CHANGELOG_PATH = "db/changelog/db.changelog-master.yaml";
+    private static final AtomicBoolean SCHEMA_INITIALIZED = new AtomicBoolean(false);
 
-    // 全クラス共通でBean登録するクラス
     protected static final Class<?>[] WELD_CORE_BEANS = {
         TestMyBatisBootstrap.class
     };
 
     @Inject
-    DataSource dataSource; // ← MyBatis 由来の DataSource をCDIで共有
+    DataSource dataSource;
 
-    // ★ DBRider が拾う接続供給口
     public ConnectionHolder connectionHolder() {
         return () -> dataSource.getConnection();
     }
 
-    /**
-     * Liquibase でスキーマを初期化
-     */
     @BeforeAll
     void setupSchema() throws Exception {
+        // ここで一度きりにする
+        if (!SCHEMA_INITIALIZED.compareAndSet(false, true)) {
+            return;
+        }
         try (Connection c = dataSource.getConnection()) {
-            Database db = DatabaseFactory.getInstance()
+            var db = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(c));
             try (Liquibase lb = new Liquibase(CHANGELOG_PATH,
                     new ClassLoaderResourceAccessor(), db)) {
@@ -56,5 +54,4 @@ private static final String CHANGELOG_PATH = "db/changelog/db.changelog-master.y
             }
         }
     }
-
 }

@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldSetup;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.example.BaseTest;
@@ -17,7 +15,7 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.List;
 
 import com.example.task.Task;
 import com.github.database.rider.core.api.dataset.DataSet;
@@ -36,53 +34,56 @@ class TaskMapperTest extends BaseTest {
 
     // データセットのパスは定数で一元化
     private static final String DS_TASKS = "datasets/tasks.yml";
-    private static final String DS_EMPTY = "datasets/empty-tasks.yml";
     private static final String DS_AFTER_INSERT = "datasets/expected_tasks_after_insert.yml";
 
 
     @Test
     @DataSet(value = DS_TASKS, cleanBefore = true)
-    void findAll_returns_expected_rows_regardless_of_order() {
-    var tasks = taskMapper.findAll();
-    tasks.sort(Comparator.comparingInt(Task::getId));
-    assertEquals(2, tasks.size());
-    assertTask(tasks.get(0), 1, "task1", false);
-    assertTask(tasks.get(1), 2, "task2", true);
+    void testFindAll() {
+        List<Task> tasks = taskMapper.findAll();
+        assertEquals(2, tasks.size());
+        assertTask(tasks.get(0), 1, "task1", false);
+        assertTask(tasks.get(1), 2, "task2", true);
     }
 
     @Test
     @DataSet(value = DS_TASKS, cleanBefore = true)
-    void findById_hit() {
-    var t = taskMapper.findById(1);
-    assertTask(t, 1, "task1", false);
+    void testFindById() {
+        var t = taskMapper.findById(1);
+                    System.out.println(t.getTitle());
+        assertTask(t, 1, "task1", false);
     }
 
     @Test
     @DataSet(value = DS_TASKS, cleanBefore = true)
     void findById_miss_returns_null() {
-    assertNull(taskMapper.findById(999));
+        assertNull(taskMapper.findById(999));
     }
 
 
     @Test
-    @DataSet(value = DS_EMPTY, cleanBefore = true, disableConstraints = true)
-    @ExpectedDataSet(value = DS_AFTER_INSERT, orderBy = "id") // 自動採番なら ignoreCols="id" も可
+    @DataSet(value = DS_TASKS, cleanBefore = true, cleanAfter = true)
+    @ExpectedDataSet(value = DS_AFTER_INSERT)
     void create_inserts_two_rows() {
-    taskMapper.create(newTask("task1", false));
-    taskMapper.create(newTask("task2", true));
-    // 期待状態は @ExpectedDataSet に委ねる。ここでの追加アサートは最小限でOK
-    assertEquals(2, taskMapper.findAll().size());
+        taskMapper.create(newTask("task3", false));
+        taskMapper.create(newTask("task4", true));
+        // 期待状態は @ExpectedDataSet に委ねる。ここでの追加アサートは最小限でOK
+        var tasks = taskMapper.findAll();
+
+        assertEquals(4, tasks.size());
+        assertTask(tasks.get(2), 3, "task3", false);
+        assertTask(tasks.get(3), 4, "task4", true);
     }
 
     // --- helpers ---
-    private static Task newTask(String title, boolean completed) {
-        var t = new Task();
+    private Task newTask(String title, boolean completed) {
+        Task t = new Task();
         t.setTitle(title);
         t.setCompleted(completed);
         return t;
     }
 
-    private static void assertTask(Task t, int id, String title, boolean completed) {
+    private void assertTask(Task t, int id, String title, boolean completed) {
         assertEquals(id, t.getId());
         assertEquals(title, t.getTitle());
         if (completed) assertTrue(Boolean.TRUE.equals(t.getCompleted()));

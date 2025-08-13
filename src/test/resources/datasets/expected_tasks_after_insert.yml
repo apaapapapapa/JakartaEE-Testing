@@ -1,5 +1,9 @@
-Task:
+task:
   - title: "task1"
     completed: false
   - title: "task2"
+    completed: true
+  - title: "task3"
+    completed: false
+  - title: "task4"
     completed: true
