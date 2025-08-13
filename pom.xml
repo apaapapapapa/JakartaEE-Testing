@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
 
         <!-- Liquibase Core for test schema migrations -->
@@ -114,6 +114,11 @@
             <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- assertj -->
         <dependency>
@@ -121,13 +126,6 @@
             <artifactId>assertj-core</artifactId>
             <version>4.0.0-M1</version>
             <scope>test</scope>
-        </dependency>
-
-        <!-- Hibernate -->
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -177,30 +175,10 @@
             <classifier>jakarta</classifier>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.database-rider</groupId>
-            <artifactId>rider-core</artifactId>
-            <version>${version.database.rider}</version>
-            <classifier>jakarta</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.database-rider</groupId>
-            <artifactId>rider-cdi</artifactId>
-            <version>${version.database.rider}</version>
-            <classifier>jakarta</classifier>
-            <scope>test</scope>
-        </dependency>
         <!-- Removed weld-junit5 dependency as it's not available -->
         
 
         <!-- cdi-testing -->
-        <dependency>
-            <groupId>io.github.cdi-unit</groupId>
-            <artifactId>cdi-unit</artifactId>
-            <version>${version.cdi-unit}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
@@ -266,8 +244,8 @@
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>4.5.0</version>
-                <configuration>
-                    <changeLogFile>src/main/resources/db/changelog-master.xml</changeLogFile>
+                <!-- <configuration>
+                    <changeLogFile>src/main/resources/db/changelog/changelog-master.xml</changeLogFile>
                     <url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</url>
                     <username>sa</username>
                     <password></password>
@@ -281,7 +259,7 @@
                             <goal>update</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions> -->
             </plugin>
         </plugins>
     </build>

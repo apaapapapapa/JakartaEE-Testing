@@ -1,8 +1,8 @@
 package com.example;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 
+import javax.sql.DataSource;
 import jakarta.inject.Inject;
 
 import org.jboss.weld.junit5.WeldJunit5Extension;
@@ -14,6 +14,8 @@ import com.example.util.TestMyBatisBootstrap;
 import com.github.database.rider.core.api.connection.ConnectionHolder;
 import com.github.database.rider.junit5.DBUnitExtension;
 
+import liquibase.Contexts;
+import liquibase.LabelExpression;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
@@ -25,6 +27,8 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class BaseTest {
 
+private static final String CHANGELOG_PATH = "db/changelog/db.changelog-master.yaml";
+
     // 全クラス共通でBean登録するクラス
     protected static final Class<?>[] WELD_CORE_BEANS = {
         TestMyBatisBootstrap.class
@@ -33,23 +37,22 @@ public abstract class BaseTest {
     @Inject
     DataSource dataSource; // ← MyBatis 由来の DataSource をCDIで共有
 
-    // ★ DBRider が拾う接続供給口（フィールド or メソッドでOK）
-    @SuppressWarnings("unused")
-    private final ConnectionHolder connectionHolder = () -> dataSource.getConnection();
+    // ★ DBRider が拾う接続供給口
+    public ConnectionHolder connectionHolder() {
+        return () -> dataSource.getConnection();
+    }
 
     /**
-     * Setting up Schema using Liquibase.
-     * 
-     * @throws Exception
+     * Liquibase でスキーマを初期化
      */
     @BeforeAll
     void setupSchema() throws Exception {
         try (Connection c = dataSource.getConnection()) {
             Database db = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(c));
-            try (Liquibase lb = new Liquibase("db/changelog-master.xml",
+            try (Liquibase lb = new Liquibase(CHANGELOG_PATH,
                     new ClassLoaderResourceAccessor(), db)) {
-                lb.update((String) null);
+                lb.update(new Contexts(), new LabelExpression());
             }
         }
     }
