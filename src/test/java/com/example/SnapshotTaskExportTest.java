@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import com.github.database.rider.junit5.api.DBRider;
 import com.github.database.rider.core.api.dataset.DataSet;
+import com.github.database.rider.core.api.dataset.DataSetFormat;
 import com.github.database.rider.core.api.exporter.ExportDataSet;
+
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -29,14 +31,15 @@ class SnapshotTaskExportTest extends BaseTest {
     TaskMapper taskMapper;
 
     @Test
-    @DataSet(value = "datasets/tasks.yml", cleanBefore = true, cleanAfter = true)
-    @ExportDataSet(outputName = "./tasks-after-export.yml")
+    @DataSet(value = "datasets/tasks.yml", cleanBefore = true)
+    @ExportDataSet(format = DataSetFormat.XML, outputName = "tasks-after-export.xml")
     void export_afterInsert() {
-        Task t = new Task();
-        t.setTitle("SnapshotTask");
-        t.setDueDate(LocalDate.now());
-        t.setCompleted(false);
-        taskMapper.create(t);
-        System.out.println(taskMapper.findAll());
+        // Task t = new Task();
+        // t.setTitle("SnapshotTask");
+        // t.setDueDate(LocalDate.now());
+        // t.setCompleted(false);
+        // taskMapper.create(t);
+        System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        System.out.println(taskMapper.findAll().get(0).getTitle());
     }
 }

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <DATABASECHANGELOG/>
+  <DATABASECHANGELOGLOCK/>
+  <TASK ID="1" TITLE="task1" COMPLETED="false"/>
+  <TASK ID="2" TITLE="task2" COMPLETED="true"/>
+</dataset>

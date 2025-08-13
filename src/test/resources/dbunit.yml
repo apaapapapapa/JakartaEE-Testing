@@ -3,5 +3,6 @@ cacheConnection: false
 # 接続は BaseTest の ConnectionHolder を使っているので省略
 
 properties:
+  schema: PUBLIC
   caseSensitiveTableNames: false
   allowEmptyFields: true
