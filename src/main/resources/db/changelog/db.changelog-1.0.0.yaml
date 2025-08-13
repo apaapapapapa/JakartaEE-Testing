@@ -4,6 +4,20 @@ databaseChangeLog:
       value: PUBLIC
 
   - changeSet:
+      id: drop-task-if-exists
+      author: you
+      preConditions:
+        onFail: MARK_RAN
+        tableExists:
+          schemaName: ${schema.name}
+          tableName: task
+      changes:
+        - dropTable:
+            schemaName: ${schema.name}
+            tableName: task
+            cascadeConstraints: true
+            
+  - changeSet:
       id: create-task
       author: you
       changes:
