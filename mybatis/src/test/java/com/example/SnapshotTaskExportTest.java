@@ -17,7 +17,7 @@ class SnapshotTaskExportTest extends BaseTest {
 
     @Test
     @DataSet(value = "datasets/tasks.yml", cleanBefore = true)
-    @ExportDataSet(format = DataSetFormat.YML, outputName = "tasks-after-export.yml")
+    @ExportDataSet(format = DataSetFormat.YML, outputName = "target/databaserider/tasks-after-export.yml")
     void export_afterInsert() {
         System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         System.out.println(taskMapper.findAll().get(0).getTitle());
