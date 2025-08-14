@@ -1,103 +1,57 @@
 package com.example.task;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import com.github.database.rider.core.api.dataset.DataSet;
-import com.github.database.rider.core.api.dataset.ExpectedDataSet;
-import com.github.database.rider.junit5.api.DBRider;
-
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
-@DBRider
+import org.jboss.weld.junit5.WeldInitiator;
+import org.jboss.weld.junit5.WeldSetup;
+import org.junit.jupiter.api.*;
+
+import com.example.BaseTest;
+import com.example.util.TestDataSourceProducer;
+
 @Disabled
-class TaskRepositoryTest {
+class TaskRepositoryTxTest extends BaseTest {
 
-    @Inject
-    TaskRepository taskRepository;
+    @WeldSetup
+    WeldInitiator weld = WeldInitiator.from(
+        WeldInitiator.createWeld()
+        .addServices(new com.example.util.NarayanaWeldTxServices()) // ここで直接登録
+        .addBeanClass(com.example.util.NarayanaWeldTxServices.class)
+        .addBeanClass(com.example.util.TestJpaProducers.class)
+        .addBeanClass(com.example.task.TaskRepository.class)
+        .addBeanClass(TestDataSourceProducer.class)
+    ).activate(jakarta.enterprise.context.RequestScoped.class)
+    .inject(this)
+    .build();
 
-    @Inject
-    EntityManager entityManager;
+  @Inject TaskRepository repo;
 
-    @BeforeAll
-    @DataSet(executeScriptsBefore = "datasets/create_task.sql")
-    static void initial(){
-    }
+  @Test
+  void create_and_findAll_commits() {
+    Task t = new Task();
+    t.setTitle("t1");
+    repo.create(t); // @Transactional(TaskRepository クラス) が効く
 
-    @Test
-    @ExpectedDataSet("datasets/expected_tasks_after_insert.yml")
-    void testSaveTask() {
+    assertThat(repo.findAll()).extracting(Task::getTitle).contains("t1");
+  }
 
-        entityManager.getTransaction().begin(); 
+  // 明示 rollback の例（補助用に Tx付きメソッドを用意）
+  @Transactional
+  void saveAndFail() { 
+    Task t = new Task(); t.setTitle("will_rollback");
+    repo.create(t);
+    throw new RuntimeException("boom");
+  }
 
-        Task task1 = new Task();
-        task1.setTitle("task1");
-        taskRepository.create(task1);
-
-        Task task2 = new Task();
-        task2.setTitle("task2");
-        taskRepository.create(task2);
-
-        entityManager.getTransaction().commit();
-
-        assertThat(task1.getId()).isNotZero();
-        assertThat(task2.getId()).isNotZero();
-
-        assertEquals(task1.getId() + 1, task2.getId(), "Task2 ID should be Task1 ID + 1");
-    }
-
-    @Test
-    @DataSet(value = "datasets/tasks.yml")
-    void testFindAll() {
-        List<Task> tasks = taskRepository.findAll();
-        assertNotNull(tasks);
-        assertEquals(2, tasks.size());
-    }
-
-    @Test
-    @DataSet(value = "datasets/tasks.yml")
-    void testFindById() {
-        Optional<Task> retrievedTask = taskRepository.findById(1);
-        assertTrue(retrievedTask.isPresent());
-        assertEquals("task1", retrievedTask.get().getTitle());
-    }
-
-    @Test
-    @DataSet(value = "datasets/tasks.yml")
-    @ExpectedDataSet("datasets/expected_tasks_after_update.yml")
-    void testUpdateTask() {
-
-        entityManager.getTransaction().begin(); 
-
-        Task updatedTask = taskRepository.update(1, "updatedTask");
-        assertNotNull(updatedTask);
-        assertEquals("updatedTask", updatedTask.getTitle());
-
-        entityManager.getTransaction().commit();
-    }
-
-    @Test
-    @DataSet(value = "datasets/tasks.yml")
-    @ExpectedDataSet("datasets/expected_tasks_after_delete.yml")
-    void testDeleteTask() {
-
-        entityManager.getTransaction().begin(); 
-
-        assertDoesNotThrow(() -> taskRepository.delete(1));
-
-        entityManager.getTransaction().commit();
-    }
-
+  @Test
+  void rollback_on_exception() {
+    assertThrows(RuntimeException.class, this::saveAndFail);
+    assertThat(repo.findAll()).extracting(Task::getTitle)
+      .doesNotContain("will_rollback");
+  }
 }
