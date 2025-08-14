@@ -29,6 +29,7 @@
     </properties>
 
     <modules>
+        <module>jpa</module>
         <module>mybatis</module>
     </modules>
 
