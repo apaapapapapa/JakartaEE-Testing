@@ -5,34 +5,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.jboss.weld.junit5.WeldInitiator;
-import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Test;
 
 import com.example.BaseTest;
 
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.example.task.Task;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.core.api.dataset.ExpectedDataSet;
-import com.github.database.rider.junit5.api.DBRider;
 
-@DBRider
 class TaskMapperTest extends BaseTest {
-
-    @WeldSetup
-    WeldInitiator weld = WeldInitiator.from(
-        Arrays.stream(WELD_CORE_BEANS).toArray(Class[]::new)
-    ).activate(RequestScoped.class).build();
 
     @Inject TaskMapper taskMapper;
 
-    // データセットのパスは定数で一元化
     private static final String DS_TASKS = "datasets/tasks.yml";
     private static final String DS_AFTER_INSERT = "datasets/expected_tasks_after_insert.yml";
 
